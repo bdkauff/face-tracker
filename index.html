@@ -119,14 +119,18 @@
 					// start loop to draw face
 					drawLoop();
 				}
-				
+				// create an empty array that will eventually hold data to be smoothed
+
 				function drawLoop() {
 					requestAnimFrame(drawLoop);
 					var positions = ctrack.getCurrentPosition();
 					var positionString = "";
           			if (positions) {
-            			for (var p = 56 ;p < 61;p++) {
-              				positionString += "featurepoint " + p + " : [" + positions[p][0].toFixed(2) + "," + positions[p][1].toFixed(2) + "]<br/>";
+            			for (var p = 55 ;p < 62;p++) {
+            				//pushes values to data array to be smoothed
+            				dataToSmooth.push(positions[p][1].toFixed(2));
+              				//prints raw data to screen
+              				positionString += "featurepoint " + p + " : [" + positions[p][0].toFixed(2) + "   ,   " + positions[p][1].toFixed(2) + "]<br/>";
             			}
             			document.getElementById('positions').innerHTML = positionString;
             		}
@@ -135,8 +139,21 @@
 					if (ctrack.getCurrentPosition()) {
 						ctrack.draw(overlay);
 					}
+
+					// trying to smooth the data, but it slows the program down too much...?
+					if(dataToSmooth.length > 0) {
+						console.log(dataToSmooth);
+						var sma10 = simple_moving_averager(10);
+						for (var i in dataToSmooth) {
+					    	var n = dataToSmooth[i];
+					    	console.log("unsmoothed =      " + dataToSmooth + "     smoothed=" + sma10(n));
+						}
+						//empty the array for the next loop
+						dataToSmooth = [];
+					}
 				}
 				
+
 				// update stats on every iteration
 				document.addEventListener('clmtrackrIteration', function(event) {
 					stats.update();
@@ -157,7 +174,7 @@
 				        return(sum/n);
 				    }
 				}
-			
+
 		</script>
 	</body>
 </html>
