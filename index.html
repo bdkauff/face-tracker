@@ -3,8 +3,13 @@
 	<head>
 		<title>face-tracking!</title>
 		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="styles.css">
+
 	</head>
 	<body>
+		<script src="//code.jquery.com/jquery-latest.min.js"
+        type="text/javascript"></script>
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 		<script src="js/utils.js"></script>
        	<script src="js/jsfeat-min.js"></script>
        	<script src="js/frontalface.js"></script>
@@ -28,6 +33,8 @@
 		<script src="js/model_pca_10_svm.js"></script>
 
 
+
+
 		<div id="container">
 		        <video id="videoel" width="400" height="300" preload="auto" loop>
 		                <!--<video id="videoel" width="320" height="240" preload="auto">-->
@@ -41,7 +48,26 @@
 		<p id = "positions"></p>
 
      	<script>
-     			
+     			// JQUERY + INTERACTION
+    			function colorFade(message) {
+    				if (message == true) {
+    					$("#videoel ").stop().animate({
+    						borderColor:'#669999'},
+    						700, function(){
+    						$(this).animate({borderColor:'#6699FF'},700);
+						});
+					};
+				}
+
+				//testing with key press
+				$(document).keydown(function(event){
+            		if(event.which == 75){
+                		colorFade(true);
+            		}
+    			});
+    			
+
+    			//CLMTRACKR
 				var vid = document.getElementById('videoel');
 				var overlay = document.getElementById('overlay');
 				var overlayCC = overlay.getContext('2d');
@@ -49,11 +75,6 @@
 				var ctrack = new clm.tracker({useWebGL : true});
 				ctrack.init(pModel);
 
-				stats = new Stats();
-                stats.domElement.style.position = 'absolute';
-                stats.domElement.style.top = '0px';
-                document.getElementById('container').appendChild( stats.domElement );
-				
 				function enablestart() {
 					var startbutton = document.getElementById('startbutton');
 					startbutton.value = "start";
@@ -98,14 +119,10 @@
 						vid.play();
 					}, function() {
 						insertAltVideo(vid);
-						//document.getElementById('gum').className = "hide";
-						//document.getElementById('nogum').className = "nohide";
 						alert("There was some problem trying to fetch video from your webcam, using a fallback video instead.");
 					});
 				} else {
 					insertAltVideo(vid);
-					//document.getElementById('gum').className = "hide";
-					//document.getElementById('nogum').className = "nohide";
 					alert("Your browser does not seem to support getUserMedia, using a fallback video instead.");
 				}
 
@@ -119,61 +136,20 @@
 					// start loop to draw face
 					drawLoop();
 				}
-				// create an empty array that will eventually hold data to be smoothed
-
 				function drawLoop() {
 					requestAnimFrame(drawLoop);
 					var positions = ctrack.getCurrentPosition();
 					var positionString = "";
           			if (positions) {
             			for (var p = 55 ;p < 62;p++) {
-            				//pushes values to data array to be smoothed
-            				dataToSmooth.push(positions[p][1].toFixed(2));
-              				//prints raw data to screen
               				positionString += "featurepoint " + p + " : [" + positions[p][0].toFixed(2) + "   ,   " + positions[p][1].toFixed(2) + "]<br/>";
             			}
             			document.getElementById('positions').innerHTML = positionString;
             		}
 					overlayCC.clearRect(0, 0, 400, 300);
-					//psrElement.innerHTML = "score :" + ctrack.getScore().toFixed(4);
 					if (ctrack.getCurrentPosition()) {
 						ctrack.draw(overlay);
 					}
-
-					// trying to smooth the data, but it slows the program down too much...?
-					if(dataToSmooth.length > 0) {
-						console.log(dataToSmooth);
-						var sma10 = simple_moving_averager(10);
-						for (var i in dataToSmooth) {
-					    	var n = dataToSmooth[i];
-					    	console.log("unsmoothed =      " + dataToSmooth + "     smoothed=" + sma10(n));
-						}
-						//empty the array for the next loop
-						dataToSmooth = [];
-					}
-				}
-				
-
-				// update stats on every iteration
-				document.addEventListener('clmtrackrIteration', function(event) {
-					stats.update();
-				}, false);
-
-				//simple moving average algorithm
-				function simple_moving_averager(period) {
-				    var nums = [];
-				    return function(num) {
-				        nums.push(num);
-				        if (nums.length > period)
-				            nums.splice(0,1);  // remove the first element of the array
-				        var sum = 0;
-				        for (var i in nums)
-				            sum += nums[i];
-				        var n = period;
-				        if (nums.length < period)
-				            n = nums.length;
-				        return(sum/n);
-				    }
 				}
 
 		</script>

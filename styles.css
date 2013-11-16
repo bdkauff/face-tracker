@@ -1,0 +1,16 @@
+#startbutton {
+	color : black;
+
+}
+
+#overlay {
+	position : absolute;
+	z-index: 1;
+}
+#videoel {
+	border-style : solid;
+	border-width : 10px;
+	border-color: #6699FF;
+	z-index: 2;
+}
+
