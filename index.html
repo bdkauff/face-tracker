@@ -56,36 +56,33 @@
 				//testing with key press
 				$(document).keydown(function(event){
             		if(event.which == 75){
-                		frameFade(true);
+                		frameFade(true, function() {
+                			$( "#link" ).show(1700);
+                		});
             		}
             		if(event.which == 74) {
-            			backgroundFade(true);
-            			
+            			frameFade(false, function(){
+            				$( "#link" ).show(1700);
+            			});
             		}
     			});
-
      			
     			function frameFade(message,showLink) {
-    				if (message == true) {
+    				if (message == false) {
     					$("#videoel, #face, #link").stop().animate({
     						borderColor:pastelColors()},
     						1700, function(){
     						$(this).animate({borderColor:pastelColors()},1000);
 						});
-						showLink();
+					}
+					else if (message == true) {
+    					$("#videoel, #face, #link").stop().animate({
+    						borderColor:pastelColors()},
+    						1700);
 					};
-				}
-    			
-    			function backgroundFade(message) {
-    				if (message == true) {
-    					console.log("background fade")
-    					$("body").stop().animate({
-    						backgroundColor:pastelColors()},
-    						1000, function(){
-    						$(this).animate({backgroundColor:'white'},1000);
-						});
-					};
-				}				
+
+					showLink();
+				};				
 				
 				function pastelColors(){
     				var r = (Math.round(Math.random()* 127) + 127).toString(16);
@@ -146,7 +143,7 @@
 						vid.play();
 
 						// shows the div "link"; this is a hack
-						frameFade(true, function(){
+						frameFade(false, function(){
 							$( "#link" ).show(1700);
 						});
 						
